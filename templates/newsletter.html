@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>{{ c.subject }}</title>
+<style>
+  @media only screen and (max-width: 620px) {
+    .container { width: 100% !important; }
+    .px { padding-left: 20px !important; padding-right: 20px !important; }
+    .h1 { font-size: 26px !important; line-height: 34px !important; }
+  }
+  a { color: #70E4EF; }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#031B2F;">
+<!-- preheader -->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#031B2F;">{{ c.preheader }}&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;</div>
+{% set font = "'Plus Jakarta Sans','Segoe UI',Arial,Helvetica,sans-serif" %}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#031B2F;">
+<tr><td align="center" style="padding:24px 0;">
+<table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#031B2F;">
+
+  <!-- header -->
+  <tr><td class="px" style="padding:8px 32px 24px 32px;border-bottom:1px solid #0B3954;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td valign="middle" style="padding-right:12px;"><img src="{{ img.logo }}" width="34" height="38" alt="LL2C" style="display:block;border:0;"></td>
+      <td valign="middle" style="font-family:{{ font }};">
+        <div style="font-size:24px;line-height:26px;font-weight:800;color:#FFFFFF;letter-spacing:0.5px;">LL2C</div>
+        <div style="font-size:10px;line-height:14px;color:#BFD7EA;letter-spacing:2.5px;">TECNOLOGIA <span style="color:#70E4EF;">&bull;</span> AUTOMAÇÃO <span style="color:#70E4EF;">&bull;</span> IA</div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  {% if img.hero %}
+  <tr><td style="padding:24px 32px 0 32px;" class="px">
+    <img src="{{ img.hero }}" width="536" alt="" style="display:block;width:100%;max-width:536px;height:auto;border:0;border-radius:16px;">
+  </td></tr>
+  {% endif %}
+
+  <!-- title + intro -->
+  <tr><td class="px" style="padding:28px 32px 8px 32px;font-family:{{ font }};">
+    <div style="font-size:11px;letter-spacing:2.5px;color:#70E4EF;font-weight:700;padding-bottom:10px;">NEWSLETTER &middot; {{ date }}</div>
+    <h1 class="h1" style="margin:0 0 16px 0;font-size:32px;line-height:40px;font-weight:800;color:#FFFFFF;">{{ c.title }}</h1>
+    <p style="margin:0;font-size:16px;line-height:26px;color:#BFD7EA;">{{ c.intro }}</p>
+  </td></tr>
+
+  {% if img.stats %}
+  <tr><td class="px" style="padding:24px 32px 8px 32px;font-family:{{ font }};">
+    <img src="{{ img.stats }}" width="536" alt="{% for s in c.key_stats %}{{ s.value }} — {{ s.label }}. {% endfor %}" style="display:block;width:100%;max-width:536px;height:auto;border:0;">
+  </td></tr>
+  {% endif %}
+
+  <!-- sections -->
+  {% for s in sections %}
+  <tr><td class="px" style="padding:24px 32px 0 32px;font-family:{{ font }};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0B3954;border-radius:16px;">
+      <tr><td style="padding:24px 24px 12px 24px;">
+        <div style="width:40px;height:4px;background-color:#E0FF4F;font-size:0;line-height:0;margin-bottom:14px;">&nbsp;</div>
+        <h2 style="margin:0 0 12px 0;font-size:20px;line-height:28px;font-weight:700;color:#FFFFFF;">{{ s.heading }}</h2>
+        {{ s.body_html }}
+      </td></tr>
+    </table>
+  </td></tr>
+  {% if loop.index == 2 and img.chart %}
+  <tr><td class="px" style="padding:24px 32px 0 32px;">
+    <img src="{{ img.chart }}" width="536" alt="{{ c.chart.title }}" style="display:block;width:100%;max-width:536px;height:auto;border:0;border-radius:16px;">
+  </td></tr>
+  {% endif %}
+  {% endfor %}
+  {% if img.chart and sections|length < 2 %}
+  <tr><td class="px" style="padding:24px 32px 0 32px;">
+    <img src="{{ img.chart }}" width="536" alt="{{ c.chart.title }}" style="display:block;width:100%;max-width:536px;height:auto;border:0;border-radius:16px;">
+  </td></tr>
+  {% endif %}
+
+  <!-- CTA -->
+  {% if c.cta and c.cta.url %}
+  <tr><td align="center" class="px" style="padding:32px 32px 8px 32px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="background-color:#E0FF4F;border-radius:12px;">
+        <a href="{{ c.cta.url }}" style="display:inline-block;padding:14px 28px;font-family:{{ font }};font-size:16px;font-weight:700;color:#1A1A1A;text-decoration:none;">{{ c.cta.text }} &rarr;</a>
+      </td>
+    </tr></table>
+  </td></tr>
+  {% endif %}
+
+  <!-- sources -->
+  {% if c.sources %}
+  <tr><td class="px" style="padding:28px 32px 0 32px;font-family:{{ font }};">
+    <div style="font-size:11px;letter-spacing:2.5px;color:#BFD7EA;font-weight:700;padding-bottom:10px;">FONTES</div>
+    {% for src in c.sources %}
+    <div style="font-size:13px;line-height:20px;padding-bottom:6px;"><a href="{{ src.url }}" style="color:#70E4EF;text-decoration:none;">{{ src.title or src.url }}</a></div>
+    {% endfor %}
+  </td></tr>
+  {% endif %}
+
+  <!-- footer -->
+  <tr><td class="px" style="padding:32px 32px 8px 32px;">
+    <div style="border-top:1px solid #0B3954;font-size:0;line-height:0;">&nbsp;</div>
+  </td></tr>
+  <tr><td class="px" align="center" style="padding:8px 32px 24px 32px;font-family:{{ font }};font-size:12px;line-height:18px;color:#BFD7EA;">
+    <img src="{{ img.logo }}" width="20" height="22" alt="" style="display:inline-block;border:0;vertical-align:middle;">
+    &nbsp;<strong style="color:#FFFFFF;">LL2C</strong> &middot; Tecnologia, Automação e IA<br>
+    Conteúdo pesquisado com Tavily e escrito com IA (Groq). Revise antes de compartilhar.
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>

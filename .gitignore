@@ -1,0 +1,28 @@
+# ── Secrets (NUNCA commitar) ─────────────────────────────
+.env
+.env.*
+credentials.json
+credential.json
+client_secret*.json
+token.json
+*.pem
+*.key
+
+# ── Intermediários descartáveis ──────────────────────────
+.tmp/*
+!.tmp/.gitkeep
+*.eml
+
+# Fontes baixadas automaticamente em runtime
+brand/fonts/
+
+# ── Python ───────────────────────────────────────────────
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ── Editor / Claude local ────────────────────────────────
+.vscode/
+.idea/
+.claude/settings.local.json
