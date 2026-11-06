@@ -13,7 +13,8 @@ token.json
 !.tmp/.gitkeep
 *.eml
 
-# Fontes baixadas automaticamente em runtime
+# Private brand guide + fonts downloaded at runtime (logos ARE versioned)
+brand/Guia de Marca*
 brand/fonts/
 
 # ── Python ───────────────────────────────────────────────

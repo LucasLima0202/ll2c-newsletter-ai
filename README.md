@@ -1,5 +1,10 @@
 <div align="center">
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="brand/Logo-complete.svg">
+  <img src="brand/logo-complete-dark.svg" alt="LL2C" width="260">
+</picture>
+
 # LL2C Newsletter AI
 
 **Give it a topic and get a researched, AI-written, illustrated newsletter in your inbox, in your brand's style.**
@@ -183,7 +188,7 @@ python tools/run_newsletter.py --slug <slug> --from-step hero
 ## Project structure
 
 ```
-├── brand/                 # Logo and brand guide (LL2C colors and typography)
+├── brand/                 # LL2C logos (SVG + PNG); fonts are downloaded here at runtime
 ├── templates/
 │   └── newsletter.html    # Email template (tables and inline CSS, Gmail-safe)
 ├── tools/                 # Python scripts, one per step
@@ -197,7 +202,7 @@ python tools/run_newsletter.py --slug <slug> --from-step hero
 
 ### Brand identity
 
-The colors come from the brand guide in `brand/` and are defined in `tools/_env.py`:
+The colors are defined in `tools/_env.py` (edit them there to use your own brand):
 
 | Color | Hex | Used for |
 |---|---|---|
@@ -206,6 +211,8 @@ The colors come from the brand guide in `brand/` and are defined in `tools/_env.
 | Light Blue | `#BFD7EA` | secondary text |
 | Electric Aqua | `#70E4EF` | highlights and links |
 | Highlight | `#E0FF4F` | CTA button and the chart's largest value |
+
+To use your own logo, replace `brand/logo.png` with a white PNG on a transparent background (it's placed on the dark email header).
 
 The **Plus Jakarta Sans** font is downloaded automatically on the first run. It's used in the infographics, but in the email body Gmail replaces it with a system font (Segoe UI or Arial).
 

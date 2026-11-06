@@ -19,9 +19,10 @@ for _s in (sys.stdout, sys.stderr):
         pass
 
 
-BRAND = ROOT / "brand"
+BRAND = ROOT / "brand"  # logos (versioned); fonts are downloaded here at runtime
+BRAND.mkdir(exist_ok=True)
 
-# LL2C brand palette (from brand/Guia de Marca LL2C em Azul Escuro.png)
+# LL2C brand palette
 COLORS = {
     "navy": "#031B2F",       # Azul Principal
     "navy2": "#0B3954",      # Azul Secundario
