@@ -2,45 +2,47 @@
 
 # LL2C Newsletter AI
 
-**Dê um tema e receba no e-mail uma newsletter pesquisada, escrita e ilustrada por IA, com a sua marca.**
-**Usa apenas APIs com plano gratuito.**
+**Give it a topic and get a researched, AI-written, illustrated newsletter in your inbox, in your brand's style.**
+**Uses only APIs with a free plan.**
 
-`Tavily` pesquisa · `Groq` escreve · `Python` desenha os infográficos · `Cloudflare FLUX` gera a imagem de capa · `Gmail API` envia
+`Tavily` researches · `Groq` writes · `Python` draws the infographics · `Cloudflare FLUX` makes the cover image · `Gmail API` sends
 
 </div>
 
 ---
 
-## Como funciona
+## How it works
 
 ```
- tema ──► 1. Pesquisa ──► 2. Redação ──► 3. Infográficos ──► 4. Capa ──► 5. HTML ──► 6. Envio
-          (Tavily)        (Groq, PT-BR)  (Pillow, marca)     (FLUX)     (template)   (Gmail)
+ topic ──► 1. Research ──► 2. Writing ──► 3. Infographics ──► 4. Cover ──► 5. HTML ──► 6. Send
+           (Tavily)        (Groq, PT-BR)  (Pillow, brand)     (FLUX)      (template)   (Gmail)
 ```
 
-Cada etapa é um script independente em `tools/` e salva o resultado em `.tmp/<slug>/`. Se algo falhar, você retoma da etapa que parou.
+Each step is a separate script in `tools/` and saves its output to `.tmp/<slug>/`. If a step fails, you can resume from it.
 
-| Etapa | Serviço | Limite grátis |
+| Step | Service | Free limit |
 |---|---|---|
-| Pesquisa | [Tavily](https://app.tavily.com) | 1.000 créditos/mês (cerca de 2 por newsletter) |
-| Redação | [Groq](https://console.groq.com) (`openai/gpt-oss-120b`) | cerca de 1.000 requisições/dia |
-| Infográficos | Python local (Pillow) | ilimitado |
-| Imagem de capa | [Cloudflare Workers AI](https://dash.cloudflare.com) (FLUX-1-schnell) | 10.000 neurons/dia (cerca de 200 imagens) |
-| Envio | [Gmail API](https://console.cloud.google.com) | grátis |
+| Research | [Tavily](https://app.tavily.com) | 1,000 credits/month (about 2 per newsletter) |
+| Writing | [Groq](https://console.groq.com) (`openai/gpt-oss-120b`) | about 1,000 requests/day |
+| Infographics | Local Python (Pillow) | unlimited |
+| Cover image | [Cloudflare Workers AI](https://dash.cloudflare.com) (FLUX-1-schnell) | 10,000 neurons/day (about 200 images) |
+| Sending | [Gmail API](https://console.cloud.google.com) | free |
 
-> **Por que não Nano Banana?** Os modelos de imagem do Gemini (Nano Banana) **não têm plano gratuito na API**. O FLUX da Cloudflare faz a capa, e o Python desenha os infográficos. Modelos de imagem costumam errar texto e números; o código não erra.
+> **Why not Nano Banana?** Gemini's image models (Nano Banana) **have no free API tier**. Cloudflare FLUX makes the cover image and Python draws the infographics. Image models often get text and numbers wrong; code doesn't.
+
+> The newsletter content is written in **Brazilian Portuguese (PT-BR)**. To change the language, edit the prompt in `tools/write_newsletter.py`.
 
 ---
 
-## Requisitos
+## Requirements
 
 - Python **3.10+**
-- Uma conta Google (Gmail)
-- Contas gratuitas em Tavily, Groq e Cloudflare. Nenhuma pede cartão.
+- A Google (Gmail) account
+- Free accounts on Tavily, Groq and Cloudflare. None of them asks for a credit card.
 
 ---
 
-## Instalação
+## Installation
 
 ```bash
 git clone https://github.com/LucasLima0202/ll2c-newsletter-ai.git
@@ -57,183 +59,183 @@ pip install -r requirements.txt
 
 ---
 
-## Configuração das chaves
+## API key setup
 
-Crie um arquivo chamado **`.env`** na raiz do projeto. Ele já está no `.gitignore` e nunca vai para o GitHub. Conteúdo:
+Create a file named **`.env`** in the project root. It's already in `.gitignore`, so it never goes to GitHub. Contents:
 
 ```env
-# Pesquisa
+# Research
 TAVILY_API_KEY=tvly-xxxxxxxxxxxxxxxx
 
-# Redação
+# Writing
 GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxx
-# Opcional: força um modelo específico (deixe vazio para usar o padrão)
+# Optional: forces a specific model (leave empty to use the default)
 GROQ_MODEL=
 
-# Imagem de capa
+# Cover image
 CLOUDFLARE_ACCOUNT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 CLOUDFLARE_API_TOKEN=xxxxxxxxxxxxxxxx
 
-# Envio
-GMAIL_SENDER=seu-email@gmail.com
-NEWSLETTER_RECIPIENTS=destinatario@gmail.com
+# Sending
+GMAIL_SENDER=your-email@gmail.com
+NEWSLETTER_RECIPIENTS=recipient@gmail.com
 ```
 
-> Para enviar para várias pessoas, separe os e-mails por vírgula: `a@x.com,b@y.com`
+> To send to several people, separate the addresses with commas: `a@x.com,b@y.com`
 
-### 1. Tavily (pesquisa)
-1. Crie uma conta em **[app.tavily.com](https://app.tavily.com)**.
-2. No dashboard, copie a **API Key**, que começa com `tvly-`.
-3. Cole em `TAVILY_API_KEY`.
+### 1. Tavily (research)
+1. Sign up at **[app.tavily.com](https://app.tavily.com)**.
+2. Copy the **API Key** from the dashboard. It starts with `tvly-`.
+3. Paste it into `TAVILY_API_KEY`.
 
-### 2. Groq (redação)
-1. Crie uma conta em **[console.groq.com](https://console.groq.com)**.
-2. Vá em **API Keys**, clique em **Create API Key** e copie a chave, que começa com `gsk_`.
-3. Cole em `GROQ_API_KEY`.
+### 2. Groq (writing)
+1. Sign up at **[console.groq.com](https://console.groq.com)**.
+2. Go to **API Keys**, click **Create API Key** and copy the key. It starts with `gsk_`.
+3. Paste it into `GROQ_API_KEY`.
 
-### 3. Cloudflare Workers AI (imagem de capa)
-1. Crie uma conta em **[dash.cloudflare.com](https://dash.cloudflare.com)**.
-2. **Account ID:** fica na página inicial do dashboard, na barra lateral direita, ou na URL (`dash.cloudflare.com/<ACCOUNT_ID>`). Cole em `CLOUDFLARE_ACCOUNT_ID`.
-3. **Token:** clique no ícone de perfil, depois em **My Profile → API Tokens → Create Token**, e use o template **"Workers AI"**. Cole em `CLOUDFLARE_API_TOKEN`.
+### 3. Cloudflare Workers AI (cover image)
+1. Sign up at **[dash.cloudflare.com](https://dash.cloudflare.com)**.
+2. **Account ID:** shown on the dashboard home page in the right sidebar, or in the URL (`dash.cloudflare.com/<ACCOUNT_ID>`). Paste it into `CLOUDFLARE_ACCOUNT_ID`.
+3. **Token:** click the profile icon, then **My Profile → API Tokens → Create Token**, and use the **"Workers AI"** template. Paste it into `CLOUDFLARE_API_TOKEN`.
 
-> Essa etapa é opcional. Se a Cloudflare falhar, a newsletter sai sem a imagem de capa.
+> This step is optional. If Cloudflare fails, the newsletter is sent without a cover image.
 
-### 4. Gmail API (envio)
-Essa é a parte mais longa, mas você só faz uma vez:
+### 4. Gmail API (sending)
+This is the longest part, but you only do it once:
 
-1. Acesse **[console.cloud.google.com](https://console.cloud.google.com)** e crie um **projeto novo**.
-2. Em **APIs e serviços → Biblioteca**, procure **Gmail API** e clique em **Ativar**.
-3. Em **APIs e serviços → Tela de consentimento OAuth**:
-   - Tipo de usuário: **Externo**
-   - Preencha o nome do app e o seu e-mail
-   - Em **Usuários de teste**, **adicione o seu próprio Gmail** (sem isso o login falha)
-4. Em **APIs e serviços → Credenciais**, clique em **Criar credenciais → ID do cliente OAuth**:
-   - Tipo: **App para computador** (*Desktop app*). É o mais simples.
-   - Se usar **Aplicativo da Web**, adicione `http://localhost:8080/` em **URIs de redirecionamento autorizados**.
-5. Baixe o JSON e salve na raiz do projeto como **`credentials.json`**, exatamente com esse nome.
+1. Go to **[console.cloud.google.com](https://console.cloud.google.com)** and create a **new project**.
+2. Under **APIs & Services → Library**, search for **Gmail API** and click **Enable**.
+3. Under **APIs & Services → OAuth consent screen**:
+   - User type: **External**
+   - Fill in the app name and your email
+   - Under **Test users**, **add your own Gmail address** (login fails without it)
+4. Under **APIs & Services → Credentials**, click **Create credentials → OAuth client ID**:
+   - Type: **Desktop app**. This is the simplest option.
+   - If you use **Web application** instead, add `http://localhost:8080/` under **Authorized redirect URIs**.
+5. Download the JSON and save it in the project root as **`credentials.json`**, with exactly that name.
 
-No primeiro envio, o navegador abre para você autorizar. Se aparecer *"O Google não verificou este app"*, clique em **Continuar**. Isso é normal para apps em modo de teste. Depois disso o login fica salvo em `token.json`, que também está no `.gitignore`.
+On the first send, a browser window opens so you can authorize the app. If you see *"Google hasn't verified this app"*, click **Continue**. That's normal for apps in testing mode. After that, the login is saved in `token.json`, which is also in `.gitignore`.
 
-### Teste rápido da configuração
+### Quick setup check
 
 ```bash
-python tools/research_topic.py --topic "teste"
+python tools/research_topic.py --topic "test"
 ```
 
-Se aparecer `8 results -> ...`, a Tavily está funcionando. Se faltar alguma chave, o script diz qual é: `Missing required env var 'X'`.
+If you see `8 results -> ...`, Tavily is working. If a key is missing, the script names it: `Missing required env var 'X'`.
 
 ---
 
-## Uso
+## Usage
 
-### Gerar uma newsletter (sem enviar)
-
-```bash
-python tools/run_newsletter.py --topic "Agentes de IA em pequenas empresas"
-```
-
-O comando faz todas as etapas e **para antes de enviar**. Abra a prévia no navegador:
-
-```
-.tmp/agentes-de-ia-em-pequenas-empresas/preview.html
-```
-
-> **Revise os fatos antes de enviar.** A IA usa apenas dados da pesquisa, mas pode errar um rótulo ou uma interpretação. Para corrigir, edite `.tmp/<slug>/content.json` e rode de novo a partir da etapa `render`.
-
-### Enviar
+### Generate a newsletter (without sending)
 
 ```bash
-python tools/run_newsletter.py --slug agentes-de-ia-em-pequenas-empresas --from-step send --send
+python tools/run_newsletter.py --topic "AI agents in small businesses"
 ```
 
-Para enviar a outro destinatário só desta vez:
+This runs every step and **stops before sending**. Open the preview in your browser:
 
-```bash
-python tools/run_newsletter.py --slug <slug> --from-step send --send --to alguem@email.com
+```
+.tmp/ai-agents-in-small-businesses/preview.html
 ```
 
-### Retomar de uma etapa
+> **Check the facts before sending.** The AI only uses data from the research, but it can still get a label or an interpretation wrong. To fix something, edit `.tmp/<slug>/content.json` and rerun from the `render` step.
 
-As etapas são `research → write → render → hero → html → send`.
+### Send
 
 ```bash
-# Editou o content.json? Regenere as imagens e o HTML:
+python tools/run_newsletter.py --slug ai-agents-in-small-businesses --from-step send --send
+```
+
+To send to a different recipient just this once:
+
+```bash
+python tools/run_newsletter.py --slug <slug> --from-step send --send --to someone@email.com
+```
+
+### Resume from a step
+
+The steps are `research → write → render → hero → html → send`.
+
+```bash
+# Edited content.json? Regenerate the images and HTML:
 python tools/run_newsletter.py --slug <slug> --from-step render
 
-# Só quer outra imagem de capa:
+# Just want a new cover image:
 python tools/run_newsletter.py --slug <slug> --from-step hero
 ```
 
-### Rodar etapas avulsas
+### Run individual steps
 
-| Script | O que faz |
+| Script | What it does |
 |---|---|
-| `tools/research_topic.py --topic "..."` | Pesquisa na Tavily e salva `research.json` |
-| `tools/write_newsletter.py --slug X` | Escreve o conteúdo com o Groq e salva `content.json` |
-| `tools/render_infographics.py --slug X` | Desenha `stats.png` e `chart.png` |
-| `tools/generate_hero_image.py --slug X` | Gera `hero.jpg` com o FLUX |
-| `tools/build_html.py --slug X [--preview]` | Monta `newsletter.html` (ou `preview.html`) |
-| `tools/send_gmail.py --slug X [--dry-run]` | Envia, ou com `--dry-run` só gera o `.eml` |
-| `tools/render_logo.py` | Converte o logo SVG em PNG (o Gmail não mostra SVG) |
+| `tools/research_topic.py --topic "..."` | Searches with Tavily and saves `research.json` |
+| `tools/write_newsletter.py --slug X` | Writes the content with Groq and saves `content.json` |
+| `tools/render_infographics.py --slug X` | Draws `stats.png` and `chart.png` |
+| `tools/generate_hero_image.py --slug X` | Generates `hero.jpg` with FLUX |
+| `tools/build_html.py --slug X [--preview]` | Builds `newsletter.html` (or `preview.html`) |
+| `tools/send_gmail.py --slug X [--dry-run]` | Sends, or with `--dry-run` only builds the `.eml` |
+| `tools/render_logo.py` | Converts the SVG logo to PNG (Gmail doesn't display SVG) |
 
 ---
 
-## Estrutura
+## Project structure
 
 ```
-├── brand/                 # Logo e guia de marca (cores e tipografia LL2C)
+├── brand/                 # Logo and brand guide (LL2C colors and typography)
 ├── templates/
-│   └── newsletter.html    # Template de e-mail (tabelas e CSS inline, compatível com Gmail)
-├── tools/                 # Scripts Python, um por etapa
+│   └── newsletter.html    # Email template (tables and inline CSS, Gmail-safe)
+├── tools/                 # Python scripts, one per step
 ├── workflows/
-│   └── newsletter.md      # Manual operacional detalhado, com aprendizados
-├── .tmp/                  # Saídas de cada execução (descartável, fora do git)
-├── .env                   # Suas chaves (você cria, fora do git)
-├── credentials.json       # OAuth do Google (você baixa, fora do git)
-└── token.json             # Login do Gmail (gerado automaticamente, fora do git)
+│   └── newsletter.md      # Detailed operating guide, with lessons learned
+├── .tmp/                  # Output of each run (disposable, not in git)
+├── .env                   # Your keys (you create it, not in git)
+├── credentials.json       # Google OAuth client (you download it, not in git)
+└── token.json             # Gmail login (created automatically, not in git)
 ```
 
-### Identidade visual
+### Brand identity
 
-As cores vêm do guia de marca em `brand/` e estão em `tools/_env.py`:
+The colors come from the brand guide in `brand/` and are defined in `tools/_env.py`:
 
-| Cor | Hex | Uso |
+| Color | Hex | Used for |
 |---|---|---|
-| Azul Principal | `#031B2F` | fundo |
-| Azul Secundário | `#0B3954` | cards |
-| Azul Claro | `#BFD7EA` | texto secundário |
-| Água Elétrica | `#70E4EF` | destaques e links |
-| Destaque | `#E0FF4F` | botão de CTA e maior valor do gráfico |
+| Main Blue | `#031B2F` | background |
+| Secondary Blue | `#0B3954` | cards |
+| Light Blue | `#BFD7EA` | secondary text |
+| Electric Aqua | `#70E4EF` | highlights and links |
+| Highlight | `#E0FF4F` | CTA button and the chart's largest value |
 
-A fonte **Plus Jakarta Sans** é baixada automaticamente na primeira execução. Ela aparece nos infográficos, mas no corpo do e-mail o Gmail troca pela fonte do sistema (Segoe UI ou Arial).
+The **Plus Jakarta Sans** font is downloaded automatically on the first run. It's used in the infographics, but in the email body Gmail replaces it with a system font (Segoe UI or Arial).
 
 ---
 
-## Problemas comuns
+## Troubleshooting
 
-| Erro | Solução |
+| Error | Fix |
 |---|---|
-| `Missing required env var 'X'` | Falta a chave `X` no `.env` |
-| `model_decommissioned` (Groq) | O modelo em `GROQ_MODEL` foi descontinuado. Deixe o campo vazio. |
-| `429` / rate limit (Groq) | Espere 1 minuto. O limite diário vale para a conta inteira. |
-| `redirect_uri_mismatch` (Google) | Use um cliente **Desktop app** ou adicione `http://localhost:8080/` às URIs de redirecionamento |
-| `access_denied` (Google) | Adicione seu Gmail em **Usuários de teste** na tela de consentimento |
-| `invalid_grant` (Gmail) | O login expirou (em modo teste dura 7 dias). Apague o `token.json` e envie de novo. |
-| Imagem de capa ausente | A Cloudflare falhou ou a cota do dia acabou. O resto funciona normalmente. |
-| E-mail caiu no spam | Marque como "Não é spam" uma vez |
+| `Missing required env var 'X'` | Key `X` is missing from `.env` |
+| `model_decommissioned` (Groq) | The model in `GROQ_MODEL` was retired. Leave the field empty. |
+| `429` / rate limit (Groq) | Wait 1 minute. The daily limit applies to the whole account. |
+| `redirect_uri_mismatch` (Google) | Use a **Desktop app** client, or add `http://localhost:8080/` to the redirect URIs |
+| `access_denied` (Google) | Add your Gmail address under **Test users** on the consent screen |
+| `invalid_grant` (Gmail) | The login expired (it lasts 7 days in testing mode). Delete `token.json` and send again. |
+| Missing cover image | Cloudflare failed or the daily quota ran out. Everything else still works. |
+| Email went to spam | Mark it as "Not spam" once |
 
 ---
 
-## Segurança
+## Security
 
-- **Nunca commite** `.env`, `credentials.json` ou `token.json`. Todos estão no `.gitignore`.
-- Se uma chave vazar, **gere outra** no painel do serviço e apague a antiga.
-- O token do Gmail tem apenas a permissão `gmail.send`: ele envia, mas não lê seus e-mails.
+- **Never commit** `.env`, `credentials.json` or `token.json`. They're all in `.gitignore`.
+- If a key leaks, **create a new one** in that service's dashboard and delete the old one.
+- The Gmail token only has the `gmail.send` permission: it can send email but can't read your inbox.
 
 ---
 
 <div align="center">
 
-**LL2C** · Tecnologia • Automação • IA
+**LL2C** · Technology • Automation • AI
 
 </div>
