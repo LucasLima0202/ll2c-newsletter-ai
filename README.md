@@ -6,7 +6,13 @@
 </picture>
 
 # LL2C Newsletter AI
+<div>
+  <img width="427" alt="img-preview-example" src="https://github.com/user-attachments/assets/1e7a9801-a8c7-4234-940c-7de59959384a" />
+</div>
 
+<sub>The image above is from a test newsletter (the style is defined based on your brand).</sub>
+<br>
+<br>
 **Give it a topic and get a researched, AI-written, illustrated newsletter in your inbox, in your brand's style.**
 **Uses only APIs with a free plan.**
 
@@ -15,6 +21,8 @@
 </div>
 
 ---
+
+
 
 ## How it works
 
