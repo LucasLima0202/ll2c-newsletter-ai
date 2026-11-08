@@ -4,7 +4,7 @@
 Turn a topic into a researched, branded (LL2C) HTML newsletter with infographics and send it via Gmail, using only free APIs.
 
 ## Inputs
-- `topic`: the newsletter subject in plain text (PT-BR or EN). Content is always written in PT-BR.
+- `topic`: the newsletter subject in plain text (any language). Content is always written in English.
 - `recipients`: `NEWSLETTER_RECIPIENTS` in `.env` (e.g. your own address while testing), or `--to`.
 
 ## Free stack (verified 2026-11-06)
@@ -55,6 +55,6 @@ Nano Banana (Gemini image models) has **no free API tier** (AI Studio pricing pa
 - 2026-11-06: Groq retired `qwen-2.5-coder-32b` and no longer lists `llama-3.3-70b-versatile`. A retired model returns a 400 `model_decommissioned` error, not a 404, so `write_newsletter.py` now skips both cases. To see current models, run `Groq().models.list()`. Leave `GROQ_MODEL` empty to use gpt-oss-120b.
 - The fontsource Plus Jakarta Sans TTF is latin-only, so symbols like `≈` and `→` came out as broken glyphs. The renderer now switches to DejaVu for that text, and the prompt asks for plain values.
 - The first full run used about 2 Tavily credits, about 1 Groq request and 1 FLUX image. It took about 1 min end to end and made a 227 KB email.
-- Groq sometimes mislabels a stat, e.g. "195 líderes que testam agentes" when the 195 were the people surveyed. Always review the preview before sending.
+- Groq sometimes mislabels a stat, e.g. "195 leaders testing agents" when the 195 were the people surveyed. Always review the preview before sending.
 - The OAuth client JSON must be named `credentials.json` (with an "s") so `.gitignore` covers it. `credential.json` and `client_secret*.json` are now ignored too. A "Web application" client also works if `http://localhost:8080/` is listed in its Authorized redirect URIs (`send_gmail.py` uses port 8080 for web clients). A "Desktop app" client needs no redirect setup.
 - The infographics are now full panels: a header with label and logo, numbered cards, progress rings for % values, a source line per stat, and gradient bars on a scaled axis. Groq now returns `source` on each `key_stats` item and on `chart`.

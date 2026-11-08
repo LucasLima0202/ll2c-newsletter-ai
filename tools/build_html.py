@@ -28,7 +28,7 @@ STYLES = {
     "a": "color:#70E4EF;text-decoration:underline;",
 }
 IMAGES = {"logo": "logo.png", "hero": "hero.jpg", "stats": "stats.png", "chart": "chart.png"}
-MONTHS = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"]
+MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
 
 
 class Sanitizer(HTMLParser):

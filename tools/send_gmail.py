@@ -29,7 +29,7 @@ def plain_text(c: dict) -> str:
     for s in c["sections"]:
         parts += ["", s["heading"].upper(), strip(s["body_html"])]
     if c.get("sources"):
-        parts += ["", "FONTES"] + [f"- {s.get('title', '')}: {s['url']}" for s in c["sources"]]
+        parts += ["", "SOURCES"] + [f"- {s.get('title', '')}: {s['url']}" for s in c["sources"]]
     return "\n".join(parts)
 
 

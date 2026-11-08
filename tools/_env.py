@@ -10,7 +10,7 @@ TMP.mkdir(exist_ok=True)
 
 load_dotenv(ROOT / ".env")
 
-# Windows consoles default to cp1252; keep PT-BR accents and dashes readable
+# Windows consoles default to cp1252; keep accents and dashes readable
 import sys  # noqa: E402
 for _s in (sys.stdout, sys.stderr):
     try:

@@ -20,7 +20,7 @@
 
 ```
  topic ──► 1. Research ──► 2. Writing ──► 3. Infographics ──► 4. Cover ──► 5. HTML ──► 6. Send
-           (Tavily)        (Groq, PT-BR)  (Pillow, brand)     (FLUX)      (template)   (Gmail)
+           (Tavily)        (Groq, EN)     (Pillow, brand)     (FLUX)      (template)   (Gmail)
 ```
 
 Each step is a separate script in `tools/` and saves its output to `.tmp/<slug>/`. If a step fails, you can resume from it.
@@ -35,7 +35,7 @@ Each step is a separate script in `tools/` and saves its output to `.tmp/<slug>/
 
 > **Why not Nano Banana?** Gemini's image models (Nano Banana) **have no free API tier**. Cloudflare FLUX makes the cover image and Python draws the infographics. Image models often get text and numbers wrong; code doesn't.
 
-> The newsletter content is written in **Brazilian Portuguese (PT-BR)**. To change the language, edit the prompt in `tools/write_newsletter.py`.
+> The newsletter content is written in **English**. To change the language, edit the `SYSTEM` prompt in `tools/write_newsletter.py`.
 
 ---
 

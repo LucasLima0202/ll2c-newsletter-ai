@@ -1,4 +1,4 @@
-"""Write newsletter content (PT-BR) with Groq from .tmp/<slug>/research.json.
+"""Write newsletter content (English) with Groq from .tmp/<slug>/research.json.
 
 Usage: python tools/write_newsletter.py --slug <slug>
 Output: .tmp/<slug>/content.json
@@ -14,30 +14,31 @@ from _env import require_env, run_dir
 # GROQ_MODEL (optional) is tried first; unknown models are skipped. Check ids: client.models.list()
 MODELS = list(dict.fromkeys(m for m in [os.getenv("GROQ_MODEL"), "openai/gpt-oss-120b", "openai/gpt-oss-20b"] if m))
 
-SYSTEM = """Você é o redator da newsletter da LL2C (Tecnologia • Automação • IA).
-Escreva em português do Brasil, tom profissional, claro e direto, para donos de negócio e profissionais de tecnologia.
-REGRAS:
-- Use SOMENTE fatos presentes na pesquisa fornecida. Não invente números, nomes ou datas.
-- Cada estatística em key_stats e no gráfico deve vir literalmente da pesquisa.
-- key_stats.value: curto, só números, %, R$, x, letras e espaços (ex.: "40%", "9 para 4"). Sem símbolos como ≈ → ~.
-- key_stats.label deve descrever o número com precisão (ex.: quem foi entrevistado vs. quem faz a ação).
-- body_html pode usar apenas <p>, <strong>, <em>, <ul>, <li>, <a href>. Sem estilos.
-- Responda APENAS com um objeto JSON válido neste formato:
+SYSTEM = """You are the newsletter writer for LL2C (Technology • Automation • AI).
+Write in English, professional, clear and direct tone, for business owners and tech professionals.
+RULES:
+- Use ONLY facts present in the research provided. Do not invent numbers, names or dates.
+- Every statistic in key_stats and in the chart must come literally from the research.
+- key_stats.value: short, only numbers, %, $, x, letters and spaces (e.g. "40%", "9 to 4"). No symbols like ≈ → ~.
+- key_stats.label must describe the number precisely (e.g. who was surveyed vs. who takes the action).
+- body_html may only use <p>, <strong>, <em>, <ul>, <li>, <a href>. No styles.
+- Reply ONLY with a valid JSON object in this format:
 {
-  "subject": "assunto do e-mail (máx 70 caracteres)",
-  "preheader": "texto de pré-visualização (máx 110 caracteres)",
-  "title": "título da edição",
-  "intro": "parágrafo de abertura (2-3 frases, texto puro)",
+  "subject": "email subject (max 70 characters)",
+  "preheader": "preview text (max 110 characters)",
+  "title": "issue title",
+  "intro": "opening paragraph (2-3 sentences, plain text)",
   "sections": [{"heading": "...", "body_html": "<p>...</p>"}],
-  "key_stats": [{"value": "73%", "label": "descrição curta (máx 60 caracteres)", "source": "nome curto da fonte (ex.: Federal Reserve SF, 2024)"}],
-  "chart": {"title": "...", "unit": "%", "labels": ["..."], "values": [12.5], "source": "nome curto da fonte"} ou null,
+  "key_stats": [{"value": "73%", "label": "short description (max 60 characters)", "source": "short source name (e.g. SF Federal Reserve, 2024)"}],
+  "chart": {"title": "...", "unit": "%", "labels": ["..."], "values": [12.5], "source": "short source name"} or null,
   "hero_prompt": "English prompt for an abstract illustration about the topic, no text, no letters",
-  "cta": {"text": "texto do botão", "url": "uma URL das fontes"},
+  "cta": {"text": "button text", "url": "a URL from the sources"},
   "sources": [{"title": "...", "url": "..."}]
 }
-- 3 a 4 seções, 3 a 4 key_stats (se a pesquisa tiver menos números, use menos).
-- chart: só inclua se houver 3+ valores numéricos comparáveis na pesquisa; senão null.
+- 3 to 4 sections, 3 to 4 key_stats (use fewer if the research has fewer numbers).
+- chart: only include it if the research has 3+ comparable numeric values; otherwise null.
 """
+
 
 REQUIRED = ["subject", "preheader", "title", "intro", "sections", "key_stats", "hero_prompt", "cta", "sources"]
 
@@ -59,10 +60,19 @@ def validate(c: dict) -> None:
             ch["values"] = [float(v) for v in ch["values"]]
 
 
+# LLMs like typographic variants (non-breaking hyphen, narrow spaces) that the brand font lacks
+_CHAR_FIX = str.maketrans({"‐": "-", "‑": "-", "‒": "-", " ": " ",
+                           " ": " ", " ": " ", "​": ""})
+
+
+def normalize(text: str) -> str:
+    return text.translate(_CHAR_FIX)
+
+
 def build_user_prompt(research: dict) -> str:
-    parts = [f"TEMA: {research['topic']}"]
+    parts = [f"TOPIC: {research['topic']}"]
     if research.get("answer"):
-        parts.append(f"RESUMO: {research['answer']}")
+        parts.append(f"SUMMARY: {research['answer']}")
     for i, r in enumerate(research["results"], 1):
         parts.append(f"[{i}] {r['title']}\nURL: {r['url']}\n{(r['content'] or '')[:1500]}")
     return "\n\n".join(parts)
@@ -80,7 +90,7 @@ def write(research: dict) -> dict:
                     model=model, messages=messages, temperature=0.5,
                     response_format={"type": "json_object"}, max_completion_tokens=4096,
                 )
-                content = json.loads(resp.choices[0].message.content)
+                content = json.loads(normalize(resp.choices[0].message.content))
                 validate(content)
                 content["_model"] = model
                 return content

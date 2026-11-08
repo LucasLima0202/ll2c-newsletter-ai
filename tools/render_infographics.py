@@ -1,8 +1,8 @@
 """Render brand-styled infographic panels from .tmp/<slug>/content.json.
 
 Outputs (1200px wide, shown at 600px in email for retina sharpness):
-  stats.png  — "EM NÚMEROS" panel: numbered stat cards, progress rings for %, sources
-  chart.png  — "ANÁLISE" panel: gradient bar chart with axis, gridlines and source
+  stats.png  — "BY THE NUMBERS" panel: numbered stat cards, progress rings for %, sources
+  chart.png  — "ANALYSIS" panel: gradient bar chart with axis, gridlines and source
 Drawn at 2x and downsampled for smooth edges. Style follows brand/Guia de Marca LL2C.
 Usage: python tools/render_infographics.py --slug <slug>
 """
@@ -93,7 +93,7 @@ def wrap(txt: str, weight: str, size: float, max_w: float, max_lines: int = 3) -
 
 
 def fmt_num(v: float) -> str:
-    return f"{v:g}".replace(".", ",")  # PT-BR decimal comma
+    return f"{v:g}"
 
 
 # ---------- canvas ----------
@@ -117,7 +117,7 @@ class Canvas:
         grad = Image.linear_gradient("L").resize((w, h))
         self.img = Image.composite(Image.new("RGBA", (w, h), rgb("#06263F")),
                                    Image.new("RGBA", (w, h), rgb(NAVY)), grad)
-        # brand "elementos gráficos": angular circuit lines, bottom-right
+        # brand "graphic elements": angular circuit lines, bottom-right
         mid = motif_top + (1 - motif_top) * 0.48
         base = [(w * 0.52, h + 20), (w * 0.70, h * mid), (w * 0.85, h * mid), (w + 20, h * motif_top)]
         shift = [(x + self.s(30), y + self.s(10)) for x, y in base]
@@ -237,7 +237,7 @@ def render_stats(stats: list, out):
     H = PAD + header_height(0) + rows * card_h + (rows - 1) * gap + PAD
     c = Canvas(H)
     c.background()
-    top = draw_header(c, "EM NÚMEROS")
+    top = draw_header(c, "BY THE NUMBERS")
     val_size = 74 if cols <= 2 else 60
 
     for i, s in enumerate(stats):
@@ -266,7 +266,7 @@ def render_stats(stats: list, out):
         src = s.get("source")
         if src:
             c.line([(x + 30, y + card_h - 52), (x + card_w - 30, y + card_h - 52)], fill=rgb(WHITE, 22), width=1)
-            src_txt = wrap(f"Fonte: {src}", "regular", 16, card_w - 60, max_lines=1)[0]
+            src_txt = wrap(f"Source: {src}", "regular", 16, card_w - 60, max_lines=1)[0]
             c.text(x + 30, y + card_h - 38, src_txt, "regular", 16, rgb(LIGHT, 150))
     c.save(out)
 
@@ -294,7 +294,7 @@ def render_chart(chart: dict, out):
     c = Canvas(H)
     plot_end = PAD + header_height(len(title_lines)) + len(labels) * row_h + axis_h
     c.background(motif_top=min(0.9, (plot_end - 8) / H))
-    y0 = draw_header(c, "ANÁLISE", title_lines)
+    y0 = draw_header(c, "ANALYSIS", title_lines)
 
     value_w = max(text_w(fmt(v), "bold", 26) for v in values)
     x0, x1 = PAD, W - PAD - value_w - 22
@@ -319,7 +319,7 @@ def render_chart(chart: dict, out):
         c.text(x1 + 22, by + bar_h / 2, fmt(v), "bold", 26, rgb(LIME if i == top_i else WHITE), anchor="lm")
 
     if source:
-        c.text(PAD, H - PAD - 6, f"Fonte: {source}", "regular", 16, rgb(LIGHT, 150), anchor="ls")
+        c.text(PAD, H - PAD - 6, f"Source: {source}", "regular", 16, rgb(LIGHT, 150), anchor="ls")
     c.save(out)
 
 
