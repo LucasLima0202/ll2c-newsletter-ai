@@ -14,7 +14,7 @@ import re
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
-from _env import BRAND, COLORS, run_dir
+from _env import BRAND, COLORS, existing_run
 
 FONT_DIR = BRAND / "fonts"
 FONT_WEIGHTS = {"bold": 800, "semibold": 700, "regular": 500}
@@ -327,7 +327,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--slug", required=True)
     a = p.parse_args()
-    d = run_dir(a.slug)
+    d = existing_run(a.slug)
     c = json.loads((d / "content.json").read_text(encoding="utf-8"))
     if c.get("key_stats"):
         render_stats(c["key_stats"][:4], d / "stats.png")

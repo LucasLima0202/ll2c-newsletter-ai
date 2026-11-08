@@ -12,7 +12,7 @@ import json
 import requests
 from PIL import Image
 
-from _env import require_env, run_dir
+from _env import require_env, existing_run
 
 MODEL = "@cf/black-forest-labs/flux-1-schnell"
 STYLE = (", minimalist futuristic tech illustration, deep dark navy blue background (#031B2F), "
@@ -43,7 +43,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--slug", required=True)
     a = p.parse_args()
-    d = run_dir(a.slug)
+    d = existing_run(a.slug)
     c = json.loads((d / "content.json").read_text(encoding="utf-8"))
     img = crop_banner(generate(c["hero_prompt"]))
     out = d / "hero.jpg"

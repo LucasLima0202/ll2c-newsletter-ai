@@ -14,7 +14,7 @@ from html.parser import HTMLParser
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup
 
-from _env import BRAND, ROOT, run_dir
+from _env import BRAND, ROOT, existing_run
 
 FONT = "'Plus Jakarta Sans','Segoe UI',Arial,Helvetica,sans-serif"
 # Allowed tags -> inline style (email clients ignore <style> for most things)
@@ -80,7 +80,7 @@ def sanitize(html: str) -> str:
 
 
 def build(slug: str, preview: bool = False):
-    d = run_dir(slug)
+    d = existing_run(slug)
     c = json.loads((d / "content.json").read_text(encoding="utf-8"))
     logo = BRAND / "logo.png"
     if not logo.exists():

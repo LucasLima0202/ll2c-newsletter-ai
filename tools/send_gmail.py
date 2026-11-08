@@ -14,7 +14,7 @@ import re
 from email.message import EmailMessage
 from email.utils import formataddr
 
-from _env import ROOT, run_dir
+from _env import ROOT, existing_run
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 IMAGES = {"logo": ("logo.png", "png"), "hero": ("hero.jpg", "jpeg"),
@@ -34,7 +34,7 @@ def plain_text(c: dict) -> str:
 
 
 def build_message(slug: str, to: str, sender: str) -> EmailMessage:
-    d = run_dir(slug)
+    d = existing_run(slug)
     c = json.loads((d / "content.json").read_text(encoding="utf-8"))
     html = (d / "newsletter.html").read_text(encoding="utf-8")
     msg = EmailMessage()
@@ -84,7 +84,7 @@ def main():
         raise SystemExit("No recipient: pass --to or set NEWSLETTER_RECIPIENTS in .env")
     sender = os.getenv("GMAIL_SENDER") or "me"
     msg = build_message(a.slug, a.to, sender)
-    eml = run_dir(a.slug) / "message.eml"
+    eml = existing_run(a.slug) / "message.eml"
     eml.write_bytes(bytes(msg))
     print(f"message built ({eml.stat().st_size // 1024} KB) -> {eml}")
     if a.dry_run:

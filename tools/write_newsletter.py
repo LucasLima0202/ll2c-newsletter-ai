@@ -9,7 +9,7 @@ import os
 
 from groq import BadRequestError, Groq, NotFoundError
 
-from _env import require_env, run_dir
+from _env import require_env, existing_run
 
 # GROQ_MODEL (optional) is tried first; unknown models are skipped. Check ids: client.models.list()
 MODELS = list(dict.fromkeys(m for m in [os.getenv("GROQ_MODEL"), "openai/gpt-oss-120b", "openai/gpt-oss-20b"] if m))
@@ -111,7 +111,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--slug", required=True)
     a = p.parse_args()
-    d = run_dir(a.slug)
+    d = existing_run(a.slug)
     research = json.loads((d / "research.json").read_text(encoding="utf-8"))
     content = write(research)
     out = d / "content.json"

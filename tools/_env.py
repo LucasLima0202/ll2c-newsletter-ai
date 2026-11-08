@@ -48,6 +48,19 @@ def run_dir(slug: str) -> Path:
     return d
 
 
+def existing_run(slug: str) -> Path:
+    """Return .tmp/<slug> for a run that already exists, or exit with a 'did you mean' hint."""
+    d = TMP / slug
+    if d.is_dir() and any(d.iterdir()):
+        return d
+    import difflib
+    runs = sorted(p.name for p in TMP.iterdir() if p.is_dir() and any(p.iterdir()))
+    close = difflib.get_close_matches(slug, runs, n=1, cutoff=0.6)
+    hint = f"\nDid you mean: --slug {close[0]}" if close else ""
+    listing = "\n".join(f"  - {r}" for r in runs) or "  (none yet - run with --topic first)"
+    raise SystemExit(f"No run found for slug '{slug}' in .tmp/.{hint}\nAvailable runs:\n{listing}")
+
+
 def require_env(name: str) -> str:
     """Return an env var or exit with a clear message if it's missing."""
     value = os.getenv(name)
