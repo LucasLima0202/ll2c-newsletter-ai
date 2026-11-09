@@ -1,248 +1,173 @@
-<div align="center">
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/Logo-complete.svg">
+    <img src="assets/Logo-complete-dark.svg" alt="LL2C" width="180">
+  </picture>
+</p>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="brand/Logo-complete.svg">
-  <img src="brand/logo-complete-dark.svg" alt="LL2C" width="260">
-</picture>
+<p align="center">
+  <img src="assets/cover.png" alt="LL2C Newsletter AI preview" width="100%">
+</p>
 
-# LL2C Newsletter AI
+<h1 align="center">LL2C Newsletter AI</h1>
 
-**Give it a topic and get a researched, AI-written, illustrated newsletter in your inbox, in your brand's style.**
-**Uses only APIs with a free plan.**
+<p align="center">Turns a topic into a researched, AI-written, illustrated newsletter and sends it through Gmail. Free-tier APIs only.</p>
 
-`Tavily` researches · `Groq` writes · `Python` draws the infographics · `Cloudflare FLUX` makes the cover image · `Gmail API` sends
+<p align="center">
+  <img src="https://img.shields.io/badge/CLI-tool-3B82F6?style=flat" alt="CLI tool">
+  <img src="https://img.shields.io/badge/language-Python-3776AB?style=flat" alt="language Python">
+  <img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="license MIT">
+</p>
 
-</div>
+## About
 
----
+A pipeline of Python scripts that researches a topic, writes the newsletter with an LLM, draws infographics, generates a cover image and sends the result as an HTML email. Each step saves its output to `.tmp/<slug>/`, so a failed run can resume from the step that broke. The newsletter is written in English; to change the language, edit the `SYSTEM` prompt in `tools/write_newsletter.py`.
 
-## How it works
+## Features
 
-```
- topic ──► 1. Research ──► 2. Writing ──► 3. Infographics ──► 4. Cover ──► 5. HTML ──► 6. Send
-           (Tavily)        (Groq, EN)     (Pillow, brand)     (FLUX)      (template)   (Gmail)
-```
-
-Each step is a separate script in `tools/` and saves its output to `.tmp/<slug>/`. If a step fails, you can resume from it.
+- Web research with Tavily (`research.json`)
+- Newsletter writing with Groq (`openai/gpt-oss-120b`, falls back to `openai/gpt-oss-20b`)
+- Infographics (`stats.png`, `chart.png`) drawn locally with Pillow in the brand colors
+- Cover image with Cloudflare Workers AI (`flux-1-schnell`); optional, the email is sent without it if the step fails
+- Gmail-safe HTML email built from a Jinja2 template, with a browser preview
+- Sending through the Gmail API with the `gmail.send` scope only
+- Resume from any step: `research → write → render → hero → html → send`
 
 | Step | Service | Free limit |
 |---|---|---|
 | Research | [Tavily](https://app.tavily.com) | 1,000 credits/month (about 2 per newsletter) |
-| Writing | [Groq](https://console.groq.com) (`openai/gpt-oss-120b`) | about 1,000 requests/day |
+| Writing | [Groq](https://console.groq.com) | about 1,000 requests/day |
 | Infographics | Local Python (Pillow) | unlimited |
-| Cover image | [Cloudflare Workers AI](https://dash.cloudflare.com) (FLUX-1-schnell) | 10,000 neurons/day (about 200 images) |
+| Cover image | [Cloudflare Workers AI](https://dash.cloudflare.com) | 10,000 neurons/day (about 200 images) |
 | Sending | [Gmail API](https://console.cloud.google.com) | free |
 
-> **Why not Nano Banana?** Gemini's image models (Nano Banana) **have no free API tier**. Cloudflare FLUX makes the cover image and Python draws the infographics. Image models often get text and numbers wrong; code doesn't.
+## Tech Stack
 
-> The newsletter content is written in **English**. To change the language, edit the `SYSTEM` prompt in `tools/write_newsletter.py`.
+- Python
+- `tavily-python`, `groq`, `requests`
+- `pillow`, `matplotlib`, `jinja2`
+- `google-api-python-client`, `google-auth-oauthlib`
+- `python-dotenv`
 
----
+## Getting Started
 
-## Requirements
+### Prerequisites
 
-- Python **3.10+**
+- Python 3.10+
 - A Google (Gmail) account
-- Free accounts on Tavily, Groq and Cloudflare. None of them asks for a credit card.
+- Free accounts on Tavily, Groq and Cloudflare (no credit card required)
 
----
-
-## Installation
+### Installation
 
 ```bash
 git clone https://github.com/LucasLima0202/ll2c-newsletter-ai.git
 cd ll2c-newsletter-ai
-
 python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# macOS / Linux
-source .venv/bin/activate
-
+.venv\Scripts\activate        # Windows
+source .venv/bin/activate     # macOS / Linux
 pip install -r requirements.txt
 ```
 
----
+### Environment Variables
 
-## API key setup
+Create a `.env` file in the project root (it is gitignored).
 
-Create a file named **`.env`** in the project root. It's already in `.gitignore`, so it never goes to GitHub. Contents:
+| Variable | Description |
+|----------|-------------|
+| `TAVILY_API_KEY` | Tavily API key (`tvly-...`), from the [Tavily dashboard](https://app.tavily.com) |
+| `GROQ_API_KEY` | Groq API key (`gsk_...`), from **API Keys** in the [Groq console](https://console.groq.com) |
+| `GROQ_MODEL` | Optional. Overrides the default model; leave empty to use the default |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID (dashboard sidebar or `dash.cloudflare.com/<ACCOUNT_ID>`) |
+| `CLOUDFLARE_API_TOKEN` | Token from **My Profile → API Tokens → Create Token**, "Workers AI" template |
+| `GMAIL_SENDER` | Sender address. Defaults to the authorized account |
+| `NEWSLETTER_RECIPIENTS` | Recipients, comma-separated (`a@x.com,b@y.com`) |
 
-```env
-# Research
-TAVILY_API_KEY=tvly-xxxxxxxxxxxxxxxx
+### Gmail API setup
 
-# Writing
-GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxx
-# Optional: forces a specific model (leave empty to use the default)
-GROQ_MODEL=
+1. In [Google Cloud Console](https://console.cloud.google.com), create a project and enable **Gmail API**.
+2. **OAuth consent screen**: user type **External**, and add your own Gmail address under **Test users**.
+3. **Credentials → Create credentials → OAuth client ID**, type **Desktop app**. For a **Web application** client, add `http://localhost:8080/` to the authorized redirect URIs.
+4. Download the JSON and save it in the project root as `credentials.json`.
 
-# Cover image
-CLOUDFLARE_ACCOUNT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-CLOUDFLARE_API_TOKEN=xxxxxxxxxxxxxxxx
+On the first send, a browser window opens to authorize the app ("Google hasn't verified this app" → **Continue**). The login is saved to `token.json`.
 
-# Sending
-GMAIL_SENDER=your-email@gmail.com
-NEWSLETTER_RECIPIENTS=recipient@gmail.com
-```
+Never commit `.env`, `credentials.json` or `token.json`. They are all in `.gitignore`. If a key leaks, revoke it and create a new one.
 
-> To send to several people, separate the addresses with commas: `a@x.com,b@y.com`
-
-### 1. Tavily (research)
-1. Sign up at **[app.tavily.com](https://app.tavily.com)**.
-2. Copy the **API Key** from the dashboard. It starts with `tvly-`.
-3. Paste it into `TAVILY_API_KEY`.
-
-### 2. Groq (writing)
-1. Sign up at **[console.groq.com](https://console.groq.com)**.
-2. Go to **API Keys**, click **Create API Key** and copy the key. It starts with `gsk_`.
-3. Paste it into `GROQ_API_KEY`.
-
-### 3. Cloudflare Workers AI (cover image)
-1. Sign up at **[dash.cloudflare.com](https://dash.cloudflare.com)**.
-2. **Account ID:** shown on the dashboard home page in the right sidebar, or in the URL (`dash.cloudflare.com/<ACCOUNT_ID>`). Paste it into `CLOUDFLARE_ACCOUNT_ID`.
-3. **Token:** click the profile icon, then **My Profile → API Tokens → Create Token**, and use the **"Workers AI"** template. Paste it into `CLOUDFLARE_API_TOKEN`.
-
-> This step is optional. If Cloudflare fails, the newsletter is sent without a cover image.
-
-### 4. Gmail API (sending)
-This is the longest part, but you only do it once:
-
-1. Go to **[console.cloud.google.com](https://console.cloud.google.com)** and create a **new project**.
-2. Under **APIs & Services → Library**, search for **Gmail API** and click **Enable**.
-3. Under **APIs & Services → OAuth consent screen**:
-   - User type: **External**
-   - Fill in the app name and your email
-   - Under **Test users**, **add your own Gmail address** (login fails without it)
-4. Under **APIs & Services → Credentials**, click **Create credentials → OAuth client ID**:
-   - Type: **Desktop app**. This is the simplest option.
-   - If you use **Web application** instead, add `http://localhost:8080/` under **Authorized redirect URIs**.
-5. Download the JSON and save it in the project root as **`credentials.json`**, with exactly that name.
-
-On the first send, a browser window opens so you can authorize the app. If you see *"Google hasn't verified this app"*, click **Continue**. That's normal for apps in testing mode. After that, the login is saved in `token.json`, which is also in `.gitignore`.
-
-### Quick setup check
+### Check the setup
 
 ```bash
 python tools/research_topic.py --topic "test"
 ```
 
-If you see `8 results -> ...`, Tavily is working. If a key is missing, the script names it: `Missing required env var 'X'`.
-
----
+A missing key is reported as `Missing required env var 'X'`.
 
 ## Usage
 
-### Generate a newsletter (without sending)
+Generate a newsletter without sending it. The preview is written to `.tmp/<slug>/preview.html`:
 
 ```bash
 python tools/run_newsletter.py --topic "AI agents in small businesses"
 ```
 
-This runs every step and **stops before sending**. Open the preview in your browser:
+Check the facts in the preview before sending. To fix content, edit `.tmp/<slug>/content.json` and rerun from `render`.
 
-```
-.tmp/ai-agents-in-small-businesses/preview.html
-```
-
-> **Check the facts before sending.** The AI only uses data from the research, but it can still get a label or an interpretation wrong. To fix something, edit `.tmp/<slug>/content.json` and rerun from the `render` step.
-
-### Send
+Send:
 
 ```bash
-python tools/run_newsletter.py --slug ai-agents-in-small-businesses --from-step send --send
-```
-
-To send to a different recipient just this once:
-
-```bash
+python tools/run_newsletter.py --slug <slug> --from-step send --send
 python tools/run_newsletter.py --slug <slug> --from-step send --send --to someone@email.com
 ```
 
-### Resume from a step
-
-The steps are `research → write → render → hero → html → send`.
+Resume from a step:
 
 ```bash
-# Edited content.json? Regenerate the images and HTML:
-python tools/run_newsletter.py --slug <slug> --from-step render
-
-# Just want a new cover image:
-python tools/run_newsletter.py --slug <slug> --from-step hero
+python tools/run_newsletter.py --slug <slug> --from-step render   # after editing content.json
+python tools/run_newsletter.py --slug <slug> --from-step hero     # new cover image only
 ```
 
-### Run individual steps
+Individual steps:
 
-| Script | What it does |
+| Script | Output |
 |---|---|
-| `tools/research_topic.py --topic "..."` | Searches with Tavily and saves `research.json` |
-| `tools/write_newsletter.py --slug X` | Writes the content with Groq and saves `content.json` |
-| `tools/render_infographics.py --slug X` | Draws `stats.png` and `chart.png` |
-| `tools/generate_hero_image.py --slug X` | Generates `hero.jpg` with FLUX |
-| `tools/build_html.py --slug X [--preview]` | Builds `newsletter.html` (or `preview.html`) |
-| `tools/send_gmail.py --slug X [--dry-run]` | Sends, or with `--dry-run` only builds the `.eml` |
-| `tools/render_logo.py` | Converts the SVG logo to PNG (Gmail doesn't display SVG) |
+| `tools/research_topic.py --topic "..."` | `research.json` |
+| `tools/write_newsletter.py --slug X` | `content.json` |
+| `tools/render_infographics.py --slug X` | `stats.png`, `chart.png` |
+| `tools/generate_hero_image.py --slug X` | `hero.jpg` |
+| `tools/build_html.py --slug X [--preview]` | `newsletter.html` / `preview.html` |
+| `tools/send_gmail.py --slug X [--dry-run]` | sends, or builds the `.eml` only |
+| `tools/render_logo.py` | PNG logo for the email header (Gmail does not display SVG) |
 
----
-
-## Project structure
-
-```
-├── brand/                 # LL2C logos (SVG + PNG); fonts are downloaded here at runtime
-├── templates/
-│   └── newsletter.html    # Email template (tables and inline CSS, Gmail-safe)
-├── tools/                 # Python scripts, one per step
-├── workflows/
-│   └── newsletter.md      # Detailed operating guide, with lessons learned
-├── .tmp/                  # Output of each run (disposable, not in git)
-├── .env                   # Your keys (you create it, not in git)
-├── credentials.json       # Google OAuth client (you download it, not in git)
-└── token.json             # Gmail login (created automatically, not in git)
-```
-
-### Brand identity
-
-The colors are defined in `tools/_env.py` (edit them there to use your own brand):
-
-| Color | Hex | Used for |
-|---|---|---|
-| Main Blue | `#031B2F` | background |
-| Secondary Blue | `#0B3954` | cards |
-| Light Blue | `#BFD7EA` | secondary text |
-| Electric Aqua | `#70E4EF` | highlights and links |
-| Highlight | `#E0FF4F` | CTA button and the chart's largest value |
-
-To use your own logo, replace `brand/logo.png` with a white PNG on a transparent background (it's placed on the dark email header).
-
-The **Plus Jakarta Sans** font is downloaded automatically on the first run. It's used in the infographics, but in the email body Gmail replaces it with a system font (Segoe UI or Arial).
-
----
-
-## Troubleshooting
+### Troubleshooting
 
 | Error | Fix |
 |---|---|
-| `Missing required env var 'X'` | Key `X` is missing from `.env` |
-| `model_decommissioned` (Groq) | The model in `GROQ_MODEL` was retired. Leave the field empty. |
-| `429` / rate limit (Groq) | Wait 1 minute. The daily limit applies to the whole account. |
-| `redirect_uri_mismatch` (Google) | Use a **Desktop app** client, or add `http://localhost:8080/` to the redirect URIs |
-| `access_denied` (Google) | Add your Gmail address under **Test users** on the consent screen |
-| `invalid_grant` (Gmail) | The login expired (it lasts 7 days in testing mode). Delete `token.json` and send again. |
-| Missing cover image | Cloudflare failed or the daily quota ran out. Everything else still works. |
-| Email went to spam | Mark it as "Not spam" once |
+| `Missing required env var 'X'` | Add `X` to `.env` |
+| `model_decommissioned` (Groq) | The model in `GROQ_MODEL` was retired. Leave it empty |
+| `429` / rate limit (Groq) | Wait 1 minute. The daily limit is per account |
+| `redirect_uri_mismatch` (Google) | Use a Desktop app client, or add `http://localhost:8080/` |
+| `access_denied` (Google) | Add your address under **Test users** |
+| `invalid_grant` (Gmail) | The token expired (7 days in testing mode). Delete `token.json` and send again |
+| No cover image | Cloudflare failed or the daily quota ran out |
 
----
+## Project Structure
 
-## Security
+```
+├── assets/                # README logos
+├── templates/
+│   └── newsletter.html    # Email template (tables + inline CSS, Gmail-safe)
+├── tools/                 # One Python script per step; brand colors in tools/_env.py
+├── workflows/
+│   └── newsletter.md      # Operating guide and lessons learned
+├── .tmp/                  # Output of each run (disposable, gitignored)
+└── requirements.txt
+```
 
-- **Never commit** `.env`, `credentials.json` or `token.json`. They're all in `.gitignore`.
-- If a key leaks, **create a new one** in that service's dashboard and delete the old one.
-- The Gmail token only has the `gmail.send` permission: it can send email but can't read your inbox.
+Brand colors are defined in `tools/_env.py`: `#031B2F` background, `#0B3954` cards, `#BFD7EA` secondary text, `#70E4EF` highlights/links, `#E0FF4F` CTA and the chart's top value.
 
----
+## License
 
-<div align="center">
+Distributed under the MIT License. See [LICENSE](LICENSE).
 
-**LL2C** · Technology • Automation • AI
+## Author
 
-</div>
+**LL2C**: [@LucasLima0202](https://github.com/LucasLima0202)

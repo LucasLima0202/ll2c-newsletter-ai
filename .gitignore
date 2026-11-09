@@ -7,7 +7,6 @@ client_secret*.json
 token.json
 *.pem
 *.key
-
 # ── Intermediários descartáveis ──────────────────────────
 .tmp/*
 !.tmp/.gitkeep
