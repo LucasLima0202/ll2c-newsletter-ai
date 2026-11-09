@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/cover.png" alt="LL2C Newsletter AI preview" width="100%">
+  <img src="assets/cover.png" alt="LL2C Newsletter AI preview" width="40%">
 </p>
 
 <h1 align="center">LL2C Newsletter AI</h1>
